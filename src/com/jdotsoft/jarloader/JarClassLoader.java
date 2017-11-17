@@ -637,8 +637,12 @@ public class JarClassLoader extends ClassLoader {
      * until all streams on it have been closed."
      */
     private void shutdown() {
+	System.err.println("JarClassLoader: delaying for other shutdown handlers to complete...");
+	try {Thread.sleep(500);}catch(Exception e){}
+	System.err.println("JarClassLoader: done delaying.");
         for (JarFileInfo jarFileInfo : lstJarFile) {
             try {
+                System.err.println("JarClassLoader: closing "+jarFileInfo.jarFile.getName());
                 jarFileInfo.jarFile.close();
             } catch (IOException e) {
                 // Ignore. In the worst case temp files will accumulate.
@@ -656,6 +660,9 @@ public class JarClassLoader extends ClassLoader {
                                + File.separator + ".JarClassLoader");
         deleteOldTemp(fileCfg);
         persistNewTemp(fileCfg);
+
+        System.err.println("JarClassLoader: shutdown() finished.");
+
     } // shutdown()
 
     /**
