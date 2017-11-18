@@ -52,6 +52,7 @@ function build_app
 {
 	echo "building app (EventTest)"
 	mkdir -p classes
+	rm -rf classes/*
 	$JAVAC -cp "${CP}" -d classes src/t/*.java src/com/jdotsoft/jarloader/JarClassLoader.java
 }
 
