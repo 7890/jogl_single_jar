@@ -10,6 +10,9 @@ import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 import java.lang.reflect.InvocationTargetException;
 
 import com.jogamp.opengl.GL;
@@ -119,6 +122,10 @@ public class EventTest
 	public void run() throws InterruptedException, InvocationTargetException
 	{
 		frame = new Frame("AWT Frame");
+		frame.setLayout(new BorderLayout());
+
+		ComponentAdapter compListener = new TestComponentAdapter();
+		frame.addComponentListener(compListener);
 
 		GLProfile profile = GLProfile.getDefault();
 		GLCapabilities capabilities = new GLCapabilities(profile);
@@ -128,14 +135,13 @@ public class EventTest
 		canvas.setBounds(0, 0, 300, 300);
 		canvas.setFocusable(true);
 
+		frame.add(canvas, BorderLayout.CENTER);
+
 		MouseListener mouseListener = new TestMouseAdapter();
 		window.addMouseListener(mouseListener);
 
 		KeyListener keyListener = new TestKeyAdapter();
 		window.addKeyListener(keyListener);
-
-		frame.setLayout(new BorderLayout());
-		frame.add(canvas, BorderLayout.CENTER);
 
 		TestGLListener glListener = new TestGLListener();
 		window.addGLEventListener(glListener);
@@ -239,4 +245,26 @@ public class EventTest
 		}
 	}
 
+	class TestComponentAdapter extends ComponentAdapter
+	{
+		public void componentHidden(ComponentEvent e)
+		{
+			System.err.println(e.getComponent().getClass().getName() + " --- hidden");
+		}
+
+		public void componentMoved(ComponentEvent e)
+		{
+			System.err.println(e.getComponent().getClass().getName() + " --- moved "+e.getComponent().getX()+" "+e.getComponent().getX()+" "+e.getComponent().getY());
+		}
+
+		public void componentResized(ComponentEvent e)
+		{
+			System.err.println(e.getComponent().getClass().getName() + " --- resized ");
+		}
+
+		public void componentShown(ComponentEvent e)
+		{
+			System.err.println(e.getComponent().getClass().getName() + " --- shown");
+		}
+	}
 }//end class EventTest
