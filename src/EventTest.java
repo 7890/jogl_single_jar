@@ -7,13 +7,20 @@
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import java.lang.reflect.InvocationTargetException;
+
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+
+import javax.swing.JFrame;
+import javax.swing.JButton;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -37,7 +44,7 @@ import com.jogamp.newt.awt.NewtCanvasAWT;
 
 public class EventTest
 {
-	static Frame frame;
+	static JFrame frame;
 	static GLWindow window;
 	static NewtCanvasAWT canvas;
 
@@ -102,7 +109,7 @@ public class EventTest
 
 	void draw(GL2 gl)
 	{
-		gl.glClearColor(0, 0, 0, 1);
+		gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		theta += 0.01;
 		double s = Math.sin(theta);
@@ -121,8 +128,13 @@ public class EventTest
 
 	public void run() throws InterruptedException, InvocationTargetException
 	{
-		frame = new Frame("AWT Frame");
+		frame = new JFrame("JFrame");
+		frame.setUndecorated(true); //needed for odd shapes
+
 		frame.setLayout(new BorderLayout());
+
+		JButton button_quit=new JButton("Quit");
+		frame.add(button_quit, BorderLayout.NORTH);
 
 		ComponentAdapter compListener = new TestComponentAdapter();
 		frame.addComponentListener(compListener);
@@ -156,6 +168,19 @@ public class EventTest
 		frame.addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
+			{
+				if(animator!=null)
+				{
+					animator.stop();
+				}
+				//calls shutdown hook
+				System.exit(0);
+			}
+		});
+
+		button_quit.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
 			{
 				if(animator!=null)
 				{
@@ -260,6 +285,9 @@ public class EventTest
 		public void componentResized(ComponentEvent e)
 		{
 			System.err.println(e.getComponent().getClass().getName() + " --- resized ");
+			//set window shape
+			Area ellipse=new Area(new Ellipse2D.Double(0,0,frame.getWidth(),frame.getHeight()));
+			frame.setShape(ellipse);
 		}
 
 		public void componentShown(ComponentEvent e)
