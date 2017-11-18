@@ -52,15 +52,15 @@ function build_app
 {
 	echo "building app (EventTest)"
 	mkdir -p classes
-	$JAVAC -cp "${CP}" -d classes src/*.java src/com/jdotsoft/jarloader/JarClassLoader.java
+	$JAVAC -cp "${CP}" -d classes src/t/*.java src/com/jdotsoft/jarloader/JarClassLoader.java
 }
 
 #takes arg: FPS
 function test_run_app
 {
 	echo "running app (EventTest)"
-	echo "java -Djava.library.path=${JAVA_LIBRARY_PATH} -cp ${CP} EventTest"
-	java -Djava.library.path="${JAVA_LIBRARY_PATH}" -cp "${CP}" EventTest $1
+	echo "java -Djava.library.path=${JAVA_LIBRARY_PATH} -cp ${CP} t.EventTest"
+	java -Djava.library.path="${JAVA_LIBRARY_PATH}" -cp "${CP}" t.EventTest $1
 }
 
 function build_self_contained_jar
