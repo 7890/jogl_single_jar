@@ -5,6 +5,8 @@
 //add KeyListener
 //tb/1710
 
+package t;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;

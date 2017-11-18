@@ -1,3 +1,5 @@
+package t;
+
 import com.jdotsoft.jarloader.JarClassLoader;
 
 //wrapper to put inside jar, calling main application via jcl
@@ -9,7 +11,7 @@ public class Launcher
 		JarClassLoader jcl = new JarClassLoader();
 		try
 		{
-			jcl.invokeMain("EventTest", args);
+			jcl.invokeMain("t.EventTest", args);
 		}
 		catch (Throwable e)
 		{
