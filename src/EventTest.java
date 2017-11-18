@@ -34,14 +34,46 @@ import com.jogamp.newt.awt.NewtCanvasAWT;
 
 public class EventTest
 {
-	Frame frame;
-	GLWindow window;
-	NewtCanvasAWT canvas;
+	static Frame frame;
+	static GLWindow window;
+	static NewtCanvasAWT canvas;
+
+	static FPSAnimator animator;
+	static volatile boolean keepRunning = true;
+
 	float theta = 0;
 	int fps=25;
 
-	public EventTest(){}
-	public EventTest(int fps){this.fps=fps;}
+
+	public EventTest()
+	{
+		addShutdownHook();
+	}
+	public EventTest(int fps)
+	{
+		this.fps=fps;
+		addShutdownHook();
+	}
+
+	private static void addShutdownHook()
+	{
+		final Thread mainThread = Thread.currentThread();
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			public void run()
+			{
+				close();
+				try
+				{
+					mainThread.join();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	public static void main(String[] args)
 	{
@@ -58,7 +90,8 @@ public class EventTest
 		try
 		{
 			test.run();
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -106,31 +139,60 @@ public class EventTest
 
 		TestGLListener glListener = new TestGLListener();
 		window.addGLEventListener(glListener);
-//		final GLAnimatorControl animator = new Animator(window);
-		final FPSAnimator animator = new FPSAnimator(window, fps, true);
+
+		animator = new FPSAnimator(window, fps, true);
 
 		animator.start();
 
 		frame.setLocation(0, 0);
 		frame.setSize(300, 300);
+
 		frame.addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				animator.stop();
+				if(animator!=null)
+				{
+					animator.stop();
+				}
+				//calls shutdown hook
 				System.exit(0);
 			}
 		});
 
-		EventQueue.invokeAndWait(new Runnable()
+		frame.validate();
+		frame.setVisible(true);
+
+		while(keepRunning)
 		{
-			public void run()
-			{
-				frame.validate();
-				frame.setVisible(true);
-			}
-		});
+			try{Thread.sleep(100);}catch(Exception e){}
+		}
 	}//end run()
+
+	static void close()
+	{
+		if(animator!=null)
+		{
+			animator.stop();
+		}
+
+		//hide immediately
+		frame.setVisible(false);
+
+		//for good measure
+		KeyListener[] kls=window.getKeyListeners();
+		for(int i=0;i<kls.length;i++)
+		{
+			window.removeKeyListener(kls[i]);
+		}
+
+		MouseListener[] mls=window.getMouseListeners();
+		for(int i=0;i<mls.length;i++)
+		{
+			window.removeMouseListener(mls[i]);
+		}
+		keepRunning = false;
+	}
 
 	//inner classes
 
