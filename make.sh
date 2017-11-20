@@ -2,9 +2,14 @@
 
 #//tb/1710
 
+DIR="$(dirname ${BASH_SOURCE[0]})"
+cd "$DIR"
+DIR="`pwd`"
+echo $DIR
+
 #pre-requisite: find and download jogamp-all-platforms.7z and decompress with 7zr
 #then set path accordingly here
-PATH_TO_JOGAMP_ALL_PLATFORMS="./jogamp-all-platforms"
+PATH_TO_JOGAMP_ALL_PLATFORMS="$DIR/jogamp-all-platforms"
 
 JOGL_ALL_JAR="${PATH_TO_JOGAMP_ALL_PLATFORMS}/jar/jogl-all.jar"
 GLUEGEN_RT_JAR="${PATH_TO_JOGAMP_ALL_PLATFORMS}/jar/gluegen-rt.jar"
@@ -53,7 +58,7 @@ function build_app
 	echo "building app (EventTest)"
 	mkdir -p classes
 	rm -rf classes/*
-	$JAVAC -cp "${CP}" -d classes src/t/*.java src/com/jdotsoft/jarloader/JarClassLoader.java
+	$JAVAC -cp "${CP}" -d classes ../src/t/*.java ../src/com/jdotsoft/jarloader/JarClassLoader.java
 }
 
 #takes arg: FPS
@@ -67,6 +72,7 @@ function test_run_app
 function build_self_contained_jar
 {
 	echo "building self-contained jar"
+
 	mkdir -p singlejar
 	rm -rf singlejar/*
 	#copy invovled dependencies (jars, shared objects)
@@ -80,14 +86,21 @@ function build_self_contained_jar
 
 	#create jar
 	cd singlejar
-	jar cfm ../${OUT_JAR_NAME} ../src/Manifest.txt *
+	jar cfm ../../_dist/${OUT_JAR_NAME} ../../src/Manifest.txt *
 	cd ..
 	echo "done."
 	echo "try running the app:"
-	echo "java -jar ${OUT_JAR_NAME} 60"
+	echo "java -jar _dist/${OUT_JAR_NAME} 60"
 }
 
 #==============================================================================
+
+mkdir -p _build
+rm -rf _build/*
+mkdir -p _dist
+rm -rf _dist/*
+cd _build
+
 build_app
 #test_run_app $1
 build_self_contained_jar
